@@ -1,16 +1,23 @@
 import "./App.css";
+import Conference from "./Conference";
 import JoinForm from "./JoinForm";
-import { useHMSActions } from "@100mslive/react-sdk";
+import { selectIsConnectedToRoom, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 
 export default function App() {
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
 
   return (
     <div className="App">
-      <JoinForm />
+      {isConnected ? (
+        <Conference />
+      ) : (
+        <JoinForm />
+      )}
       <br />
       <button onClick={() => {
-        hmsActions.leave();
+        if (isConnected)
+          hmsActions.leave();
       }}>
         Leave
       </button>
