@@ -22,7 +22,6 @@ function JoinForm() {
       roomCode,
     } = inputValues
 
-    // use room code to fetch auth token
     const authToken = await hmsActions.getAuthTokenByRoomCode({ roomCode })
 
     try {
@@ -40,15 +39,15 @@ function JoinForm() {
           required
           value={inputValues.userName}
           onChange={handleInputChange}
-          id="name"
+          id="userName"
           type="text"
-          name="name"
+          name="userName"
           placeholder="Your name"
         />
       </div>
       <div className="input-container">
         <input
-          id="room-code"
+          id="roomCode"
           type="text"
           name="roomCode"
           placeholder="Room code"
