@@ -1,9 +1,14 @@
-import { HMSPeer, useVideo } from "@100mslive/react-sdk";
+import { HMSPeer, useHMSActions, useVideo } from "@100mslive/react-sdk";
 
 function Peer({ peer }: {peer: HMSPeer}) {
   const { videoRef } = useVideo({
     trackId: peer.videoTrack
   });
+  const hmsActions = useHMSActions();
+
+  const addTrack = async () => {
+    await hmsActions.addTrack(new MediaStreamTrack(), 'regular')
+  }
   return (
     <div className="peer-container">
       <video
