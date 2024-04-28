@@ -8,7 +8,7 @@ import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
 export default function App() {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [audioSrc, setAudioSrc] = useState('');
-  
+
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8081');
     ws.onopen = () => console.log("Connection established!!");
@@ -37,7 +37,7 @@ export default function App() {
       )}
       <br />
       <figure>
-        <figcaption>Listen to the T-Rex:</figcaption>
+        <figcaption>Listen to Audio:</figcaption>
         <audio controls src={audioSrc}></audio>
       </figure>
     </div>

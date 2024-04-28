@@ -1,14 +1,28 @@
-import { HMSPeer, useHMSActions, useVideo } from "@100mslive/react-sdk";
+import { HMSPeer, selectAppData, selectLocalAudioTrackID, useHMSActions, useHMSStore, useVideo } from "@100mslive/react-sdk";
+import { useEffect, useState } from "react";
 
 function Peer({ peer }: {peer: HMSPeer}) {
   const { videoRef } = useVideo({
     trackId: peer.videoTrack
   });
   const hmsActions = useHMSActions();
+  const audioTrackId = useHMSStore(selectLocalAudioTrackID);
+  const [audioStream, setAudioStream] = useState<MediaStream>();
+  const state: boolean = useHMSStore(selectAppData("record"));
 
-  const addTrack = async () => {
-    await hmsActions.addTrack(new MediaStreamTrack(), 'regular')
-  }
+  useEffect(() => {
+    console.log(audioStream);
+  }, [audioStream]);
+
+  useEffect(() => {
+    if(audioTrackId !== undefined) {
+      const audioTrack = hmsActions.getNativeTrackById(audioTrackId);
+      if(audioTrack) {
+        setAudioStream(new MediaStream([audioTrack]));
+      }
+    }
+  },[audioTrackId, hmsActions]);
+
   return (
     <div className="peer-container">
       <video

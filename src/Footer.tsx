@@ -1,4 +1,5 @@
 import {useAVToggle, useHMSActions } from "@100mslive/react-sdk";
+import { useState } from "react";
 
 function Footer() {
   const {
@@ -8,6 +9,12 @@ function Footer() {
     toggleVideo
   } = useAVToggle();
   const hmsActions = useHMSActions();
+  const [record, setRecord] = useState(false);
+  const handleRecord = () => {
+    if(record) hmsActions.setAppData("record", true);
+    else hmsActions.setAppData("record", false);
+    setRecord((prev) => !prev);
+  };
   return (
     <div className="control-bar">
       <button className="btn-control" onClick={toggleAudio}>
@@ -20,6 +27,9 @@ function Footer() {
           hmsActions.leave();
       }}>
         Leave
+      </button>
+      <button className="btn-primary" onClick={handleRecord}>
+        {record ? "Record" : "Stop"}
       </button>
     </div>
   );
