@@ -3,14 +3,16 @@ import "./App.css";
 import Conference from "./Conference";
 import Footer from "./Footer";
 import JoinForm from "./JoinForm";
-import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
+import { selectIsConnectedToRoom, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 
 export default function App() {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const hmsActions = useHMSActions();
   const [audioSrc, setAudioSrc] = useState('');
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8081');
+    hmsActions.setAppData("wsConn", ws);
     ws.onopen = () => console.log("Connection established!!");
     ws.onmessage = async (event) => {
       const audioBlob = new Blob([event.data], { type: 'audio/mpeg' });
@@ -20,10 +22,7 @@ export default function App() {
     ws.onclose = () => {
       console.log('Connection closed');
     };
-    return () => {
-      ws.close();
-    };
-  }, [])
+  }, [hmsActions]);
 
   return (
     <div className="App">

@@ -8,7 +8,8 @@ function Peer({ peer }: {peer: HMSPeer}) {
   const hmsActions = useHMSActions();
   const audioTrackId = useHMSStore(selectLocalAudioTrackID);
   const [audioStream, setAudioStream] = useState<MediaStream>();
-  const state: boolean = useHMSStore(selectAppData("record"));
+  const isRecord: boolean = useHMSStore(selectAppData("record"));
+  const websocketConn: WebSocket = useHMSStore(selectAppData("wsConn"));
 
   useEffect(() => {
     console.log(audioStream);
@@ -22,6 +23,34 @@ function Peer({ peer }: {peer: HMSPeer}) {
       }
     }
   },[audioTrackId, hmsActions]);
+
+  useEffect(() => {
+    if(audioStream) {
+      const mediaRecorder = new MediaRecorder(audioStream);
+      if(isRecord) {
+        mediaRecorder.start();
+        const recordedChunks: Blob[] = [];
+          // Event handler to store chunks of data
+        mediaRecorder.ondataavailable = (event) => {
+          console.log("WSCONNN ", websocketConn);
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+          }
+          // Event handler when recording stops
+          mediaRecorder.onstop = () => {
+            // Combine all recorded chunks into a single Blob
+            const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+    
+            // Now you can send this blob over WebSocket
+            websocketConn.send(blob);
+          };
+        };
+      }
+      else {
+        mediaRecorder.stop();
+      }
+    }
+  }, [audioStream, isRecord, websocketConn])
 
   return (
     <div className="peer-container">
