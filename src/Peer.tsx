@@ -1,5 +1,5 @@
 import { HMSPeer, selectAppData, selectLocalAudioTrackID, useHMSActions, useHMSStore, useVideo } from "@100mslive/react-sdk";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function Peer({ peer }: {peer: HMSPeer}) {
   const { videoRef } = useVideo({
@@ -10,6 +10,7 @@ function Peer({ peer }: {peer: HMSPeer}) {
   const [audioStream, setAudioStream] = useState<MediaStream>();
   const isRecord: boolean = useHMSStore(selectAppData("record"));
   const websocketConn: WebSocket = useHMSStore(selectAppData("wsConn"));
+  const mediaRecorder = useMemo(() => audioStream ? new MediaRecorder(audioStream) : undefined, [audioStream]);
 
   useEffect(() => {
     console.log(audioStream);
@@ -25,32 +26,26 @@ function Peer({ peer }: {peer: HMSPeer}) {
   },[audioTrackId, hmsActions]);
 
   useEffect(() => {
-    if(audioStream) {
-      const mediaRecorder = new MediaRecorder(audioStream);
+    if(mediaRecorder) {
+      const recordedChunks: Blob[] = [];
+      // Event handler to store chunks of data
+      mediaRecorder.ondataavailable = (event) => {
+        recordedChunks.push(event.data);
+      };
+      mediaRecorder.onstop = () => {
+        // Combine all recorded chunks into a single Blob
+        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+        // Send blob over websocket
+        websocketConn.send(blob);
+      };
       if(isRecord) {
         mediaRecorder.start();
-        const recordedChunks: Blob[] = [];
-          // Event handler to store chunks of data
-        mediaRecorder.ondataavailable = (event) => {
-          console.log("WSCONNN ", websocketConn);
-          if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-          }
-          // Event handler when recording stops
-          mediaRecorder.onstop = () => {
-            // Combine all recorded chunks into a single Blob
-            const blob = new Blob(recordedChunks, { type: 'audio/wav' });
-    
-            // Now you can send this blob over WebSocket
-            websocketConn.send(blob);
-          };
-        };
       }
       else {
         mediaRecorder.stop();
       }
     }
-  }, [audioStream, isRecord, websocketConn])
+  }, [isRecord, mediaRecorder, websocketConn])
 
   return (
     <div className="peer-container">
