@@ -1,4 +1,4 @@
-import { HMSPeer, selectAppData, selectLocalAudioTrackID, useHMSActions, useHMSStore, useVideo } from "@100mslive/react-sdk";
+import { HMSPeer, selectAppData, useHMSActions, useHMSStore, useVideo } from "@100mslive/react-sdk";
 import { useEffect, useMemo, useState } from "react";
 
 function Peer({ peer }: {peer: HMSPeer}) {
@@ -6,7 +6,7 @@ function Peer({ peer }: {peer: HMSPeer}) {
     trackId: peer.videoTrack
   });
   const hmsActions = useHMSActions();
-  const audioTrackId = useHMSStore(selectLocalAudioTrackID);
+  const audioTrackId = peer.audioTrack;
   const [audioStream, setAudioStream] = useState<MediaStream>();
   const isRecord: boolean = useHMSStore(selectAppData("record"));
   const websocketConn: WebSocket = useHMSStore(selectAppData("wsConn"));

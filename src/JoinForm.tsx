@@ -22,7 +22,7 @@ function JoinForm() {
       roomCode,
     } = inputValues
 
-    const authToken = await hmsActions.getAuthTokenByRoomCode({ roomCode })
+    const authToken = await hmsActions.getAuthTokenByRoomCode({ roomCode });
 
     try {
       await hmsActions.join({ userName, authToken });
