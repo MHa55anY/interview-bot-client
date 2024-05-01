@@ -4,6 +4,7 @@ import Conference from "./Conference";
 import Footer from "./Footer";
 import JoinForm from "./JoinForm";
 import { selectIsConnectedToRoom, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
+import AudioPlayer from "./AudioPlayer";
 
 export default function App() {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -35,10 +36,7 @@ export default function App() {
         <JoinForm />
       )}
       <br />
-      <figure>
-        <figcaption>Listen to Audio:</figcaption>
-        <audio controls src={audioSrc}></audio>
-      </figure>
+      <AudioPlayer audioSrc={audioSrc} />
     </div>
   );
 }
