@@ -1,16 +1,23 @@
 import { selectPeers, useHMSStore } from "@100mslive/react-sdk";
-import React, { useEffect } from "react";
 import Peer from "./Peer";
+import { useEffect } from "react";
+import axios from "axios";
 
 function Conference() {
   const peers = useHMSStore(selectPeers);
+  const localPeer = peers.find((p) => p.isLocal)
 
   useEffect(() => {
     const initChatBot = async () => {
-      await fetch("http://localhost:8000/init-bot")
+      await axios.get("http://localhost:8000/init-bot", {
+        params: {
+          role: localPeer?.roleName
+        }
+      })
     }
     initChatBot();
-  }, []);
+  }, [localPeer?.roleName]);
+
   return (
     <div className="conference-section">
       <h2>Conference</h2>
