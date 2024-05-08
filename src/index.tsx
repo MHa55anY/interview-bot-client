@@ -7,11 +7,11 @@ import App from "./App";
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
-  <StrictMode>
+  // <StrictMode>
     <HMSRoomProvider>
       <App />
-    </HMSRoomProvider>
-  </StrictMode>,
+    </HMSRoomProvider>,
+  // </StrictMode>,
   rootElement
 );
 
