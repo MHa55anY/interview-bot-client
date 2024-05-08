@@ -32,7 +32,7 @@ function JoinForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form id="joinForm" onSubmit={handleSubmit}>
       <h2>Join Room</h2>
       <div className="input-container">
         <input
@@ -54,7 +54,7 @@ function JoinForm() {
           onChange={handleInputChange}
         />
       </div>
-      <button className="btn-primary">Join</button>
+      <button className="btn-primary" type="submit">Join</button>
     </form>
   );
 }
