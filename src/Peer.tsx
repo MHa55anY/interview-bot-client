@@ -18,13 +18,13 @@ function Peer({ peer }: {peer: HMSPeer}) {
   }, [audioStream]);
 
   useEffect(() => {
-    if(audioTrackId !== undefined) {
+    if(audioTrackId !== undefined && peer.roleName==='guest') {
       const audioTrack = hmsActions.getNativeTrackById(audioTrackId);
       if(audioTrack) {
         setAudioStream(new MediaStream([audioTrack]));
       }
     }
-  },[audioTrackId, hmsActions]);
+  },[audioTrackId, hmsActions, peer.roleName]);
 
   useEffect(() => {
     if(mediaRecorder) {
