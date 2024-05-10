@@ -66,6 +66,20 @@ export const ConferenceScreen = () => {
     }
   };
 
+  const peers = useHMSStore(selectPeers);
+  const localPeer = peers.find(p => p.isLocal);
+
+  useEffect(() => {
+    const initChatBot = async () => {
+      await axios.get("http://localhost:8000/init-bot", {
+        params: {
+          role: localPeer?.roleName,
+        },
+      });
+    };
+    initChatBot();
+  }, [localPeer?.roleName]);
+
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
     dropdownListRef.current = dropdownList || [];
