@@ -5,7 +5,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { match } from 'ts-pattern';
-import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectLocalPeerRoleName, selectPeers, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
@@ -27,6 +27,8 @@ import {
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { SESSION_STORE_KEY } from '../common/constants';
+import Recorder from '../../../CustomComponents/Recorder';
+import useWebSocket from '../../../hooks/useWebSocket';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
@@ -49,6 +51,14 @@ export const VideoStreamingSection = ({
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
+  const wsConn = useWebSocket();
+  const peers = useHMSStore(selectPeers);
+  const interviewee = peers.find(
+    p => p?.roleName === "guest"
+  );
+  let nativeTrack: MediaStreamTrack | undefined;
+
+  if(interviewee && interviewee.audioTrack) nativeTrack = hmsActions.getNativeTrackById(interviewee.audioTrack);
 
   useEffect(() => {
     if (!isConnected) {
@@ -127,6 +137,7 @@ export const VideoStreamingSection = ({
             hideControls={hideControls}
           />
         </Box>
+        <Recorder nativeTrack={nativeTrack} websocketConn={wsConn}/>
       </Flex>
     </Suspense>
   );
