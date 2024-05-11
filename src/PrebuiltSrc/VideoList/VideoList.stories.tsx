@@ -79,7 +79,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
   );
 };
 
-const Template: ComponentStory<typeof VideoListStory> = args => <VideoListStory {...args} />;
+const Template: ComponentStory<typeof VideoListStory> = (args: VideoListProps) => <VideoListStory {...args} />;
 
 export const Example = Template.bind({});
 
