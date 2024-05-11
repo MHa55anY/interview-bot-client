@@ -49,7 +49,6 @@ import {
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
 import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
-import Recorder from '../../CustomComponents/Recorder';
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -100,6 +99,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const reactiveStore = useRef<HMSPrebuiltRefType>();
     const [hydrated, setHydrated] = React.useState(false);
+    const searchParams = new URLSearchParams(window.location.search);
+    roomCode = searchParams.get("roomcode") as string;
 
     useEffect(() => {
       setHydrated(true);
@@ -298,7 +299,6 @@ function AppRoutes({
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <Recorder />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
