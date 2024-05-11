@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   selectAppData,
   selectPeers,
@@ -7,17 +7,15 @@ import {
 } from "@100mslive/react-sdk";
 import { Button } from "@100mslive/roomkit-react";
 
-const Recorder = () => {
+const Recorder: FC<{nativeTrack?: MediaStreamTrack, websocketConn: WebSocket}> = ({ nativeTrack, websocketConn }) => {
   const hmsActions = useHMSActions();
   const interviewee = useHMSStore(selectPeers).find(
     p => p?.roleName === "guest"
   );
-  const audioTrackId = interviewee.audioTrack;
-  const [audioStream, setAudioStream] = useState();
+  const [audioStream, setAudioStream] = useState<MediaStream>();
   const isRecord = useHMSStore(selectAppData("record"));
-  const websocketConn = useHMSStore(selectAppData("wsConn"));
   const [record, setRecord] = useState(false);
-  const handleRecord = record => {
+  const handleRecord = (record: boolean) => {
     setRecord(record);
     if (record) hmsActions.setAppData("record", true);
     else hmsActions.setAppData("record", false);
@@ -26,19 +24,18 @@ const Recorder = () => {
     () => (audioStream ? new MediaRecorder(audioStream) : undefined),
     [audioStream]
   );
-  console.log("hmsActions", hmsActions);
+
   useEffect(() => {
-    if (audioTrackId !== undefined && interviewee.roleName === "guest") {
-      const audioTrack = hmsActions.getNativeTrackById(audioTrackId);
-      if (audioTrack) {
-        setAudioStream(new MediaStream([audioTrack]));
+    if (interviewee?.roleName === "guest") {
+      if (nativeTrack) {
+        setAudioStream(new MediaStream([nativeTrack]));
       }
     }
-  }, [audioTrackId, hmsActions, interviewee.roleName]);
+  }, [interviewee?.roleName, nativeTrack]);
 
   useEffect(() => {
     if (mediaRecorder) {
-      const recordedChunks = [];
+      const recordedChunks:BlobPart[] = [];
       // Event handler to store chunks of data
       mediaRecorder.ondataavailable = event => {
         recordedChunks.push(event.data);
@@ -47,6 +44,7 @@ const Recorder = () => {
         // Combine all recorded chunks into a single Blob
         const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
         // Send blob over websocket
+        console.log("SENDING AUDIO")
         websocketConn.send(blob);
       };
       if (isRecord) {
